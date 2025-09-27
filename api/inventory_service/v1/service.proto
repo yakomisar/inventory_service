@@ -2,17 +2,29 @@ syntax = "proto3";
 package inventory_service.v1;
 
 import "google/api/annotations.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
 
 // IMPORT_PATH → the full Go module path where the generated code will live.
 // PACKAGE_NAME → the Go package name to use in the generated code.
 option go_package = "github.com/yakomisar/inventory_service/pkg/pb/inventory_service/v1;v1"; // IMPORT_PATH;PACKAGE_NAME
+option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
+  info: {
+    title: "Inventory Service API" // <— тайтл
+    version: "1.0.0" // <— версия API
+    description: "CRUD по товарам, пинг и т.д."
+  }
+  consumes: "application/json"
+  produces: "application/json"
+};
 
 service InventoryService {
   rpc GetItem(GetItemRequest) returns (GetItemResponse) {
     option (google.api.http) = {get: "/v1/items/{id}"};
   }
 
-  rpc Ping(PingRequest) returns (PingResponse) {}
+  rpc Ping(PingRequest) returns (PingResponse) {
+    option (google.api.http) = {get: "/v1/ping"};
+  }
 }
 
 message GetItemRequest {

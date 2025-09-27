@@ -46,8 +46,15 @@ go-lint: $(GOLANGCI_BIN)
 lint: go-lint buf-lint
 
 .PHONY: generate
-generate: .protodeps buf-lint
-	$(BUF_BIN) generate -v
+generate: .protodeps proto-update buf-lint
+	$(BUF_BIN) generate -v --template buf.gen.yaml
+
+.PHONY: docs
+docs: generate
+	@test -f api/api.swagger.json || (echo "Missing api/api.swagger.json. Run 'make generate'"; exit 1)
+	mkdir -p internal/docs/static
+	cp api/api.swagger.json internal/docs/static/api.swagger.json
+	@echo "✓ OpenAPI ready at api/swagger/api.swagger.json"
 
 .PHONY: run
 run:
@@ -58,3 +65,4 @@ clean:
 	rm -rf $(LOCAL_BIN)
 	find pkg/pb -type f -name '*.go' -delete || true
 	rm -f api/api.swagger.json || true
+	rm -rf internal/docs/static || true
